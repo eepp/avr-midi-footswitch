@@ -44,7 +44,7 @@ static void init_uart(void) {
 	UCSR0B |= _BV(TXEN0);
 	
 	/* set MIDI baud rate */
-	UBRR0 = 31;
+	UBRR0 = UBRR_VAL;
 }
 
 static void init_io(void) {
