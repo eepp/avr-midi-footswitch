@@ -23,21 +23,29 @@
 
 #include "config.h"
 
-/* update MIDI cc values period (prescaler: /1024) */
-#define UPD_MIDI_CC_PER		(F_CPU / 1024 / 4)
-
 /* UBRR value depending on MIDI baud rate and MCU freq. */
-#define UBRR_VAL		((F_CPU / (16 * 31250)) - 1)
+#define UBRR_VAL		((F_CPU / (16 * 31250UL)) - 1)
 
 /* last footswitches values (must initialize) */
 static uint8_t g_fs_last[NB_FS];
 
+#ifdef SYNC_BTN_PRESENT
+/* last sync button state (0 means released) */
+static uint8_t g_sync_last = 0;
+#endif /* SYNC_BTN_PRESENT */
+
 /* MIDI status byte */
-static uint8_t g_midi_status_byte = 0xb0 | MIDI_CHAN;
+static const uint8_t g_midi_status_byte = 0xb0 | MIDI_CHAN;
 
 static inline uint8_t read_fs(uint8_t index) {
 	return *(g_fs_pins[index]) & g_fs_masks[index];
 }
+
+#ifdef SYNC_BTN_PRESENT
+static inline uint8_t read_sync(void) {
+	return *g_sync_pin & g_sync_mask;
+}
+#endif /* SYNC_BTN_PRESENT */
 
 static void init_uart(void) {
 	/* enable transmitter */
@@ -57,6 +65,11 @@ static void init_io(void) {
 	for (x = 0; x < NB_FS; ++x) {
 		*(g_fs_ddrs[x]) &= ~(g_fs_masks[x]);
 	}
+	
+#ifdef SYNC_BTN_PRESENT
+	/* set sync button as input */
+	*g_sync_ddr &= ~g_sync_mask;
+#endif /* SYNC_BTN_PRESENT */
 }
 
 static void init_fs(void) {
@@ -66,17 +79,6 @@ static void init_fs(void) {
 	for (x = 0; x < NB_FS; ++x) {
 		g_fs_last[x] = read_fs(x);
 	}
-}
-
-static void init(void) {
-	/* init. inputs/outputs */
-	init_io();
-	
-	/* init. footswitches */
-	init_fs();
-	
-	/* init UART for MIDI transmission */
-	init_uart();
 }
 
 static inline void wait_uart_tx_ready(void) {
@@ -101,6 +103,29 @@ static void send_cc(uint8_t index, uint8_t on) {
 	uart_send(on ? 127 : 0);
 }
 
+static void send_all_cc(void) {
+	uint8_t x;
+	
+	for (x = 0; x < NB_FS; ++x) {
+		send_cc(x, g_fs_last[x]);
+	}
+}
+
+static void init(void) {
+	/* init. inputs/outputs */
+	init_io();
+	
+	/* init. footswitches */
+	init_fs();
+	
+	/* init UART for MIDI transmission */
+	init_uart();
+	
+	/* send initial MIDI cc values on power on */
+	_delay_ms(100.0);
+	send_all_cc();
+}
+
 static void footswitch(void) {
 	uint8_t x, s;
 	
@@ -108,14 +133,31 @@ static void footswitch(void) {
 		for (x = 0; x < NB_FS; ++x) {
 			if (read_fs(x) != g_fs_last[x]) {
 				/* debounce */
-				_delay_ms(10.0);
+				_delay_ms(SW_DEB_TIME);
 				s = read_fs(x);
 				if (s != g_fs_last[x]) {
+					/* footswitch is toggled */
 					g_fs_last[x] = s;
 					send_cc(x, s);
 				}
 			}
 		}
+
+#ifdef SYNC_BTN_PRESENT
+		/* sync button */
+		if (read_sync() != g_sync_last) {
+			/* debounce */
+			_delay_ms(SW_DEB_TIME);
+			s = read_sync();
+			if (s != g_sync_last) {
+				g_sync_last = s;
+				if (s) {
+					/* sync button is down */
+					send_all_cc();
+				}
+			}
+		}
+#endif /* SYNC_BTN_PRESENT */
 	}
 }
 
@@ -123,5 +165,6 @@ int main(void) {
 	init();
 	footswitch();
 
+	/* never reached lol */
 	return 0;
 }

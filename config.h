@@ -1,8 +1,11 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
-/* MIDI channel */
+/* MIDI channel (0 means channel 1) */
 #define MIDI_CHAN		0
+
+/* switches debounce time (ms) */
+#define SW_DEB_TIME		10.0
 
 /* number of footswitches */
 #define NB_FS			4
@@ -23,7 +26,7 @@ static volatile uint8_t* g_fs_pins[] = {
 	&PINC,
 };
 
-/* footswitches pin indexes */
+/* footswitches pins masks */
 static uint8_t g_fs_masks[] = {
 	_BV(PC0),
 	_BV(PC1),
@@ -38,5 +41,13 @@ static uint8_t g_midi_cc[] = {
 	104,
 	105,
 };
+
+/* sync push button */
+#define SYNC_BTN_PRESENT /* comment this to disable */
+#ifdef SYNC_BTN_PRESENT
+static volatile uint8_t* g_sync_ddr = &DDRC;
+static volatile uint8_t* g_sync_pin = &PINC;
+static volatile uint8_t g_sync_mask = _BV(PC4);
+#endif /* SYNC_BTN_PRESENT */
 
 #endif /* _CONFIG_H */

@@ -10,7 +10,7 @@ H_SRC = config.h
 
 # target MCU
 MCU = atmega328p
-F_CPU = 16000000UL
+F_CPU = 8000000UL
 
 # targets
 TARGET = avr-midi-footswitch
