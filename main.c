@@ -86,20 +86,18 @@ static inline void wait_uart_tx_ready(void) {
 }
 
 static inline void uart_send(uint8_t byte) {
+	wait_uart_tx_ready();
 	UDR0 = byte;
 }
 
 static void send_cc(uint8_t index, uint8_t on) {
 	/* MIDI status */
-	wait_uart_tx_ready();
 	uart_send(g_midi_status_byte);
 	
 	/* MIDI cc */
-	wait_uart_tx_ready();
 	uart_send(g_midi_cc[index]);
 	
 	/* 0 (off) or 127 (on) */
-	wait_uart_tx_ready();
 	uart_send(on ? 127 : 0);
 }
 
