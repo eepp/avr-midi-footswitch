@@ -118,7 +118,7 @@ static void init(void) {
 	/* init. footswitches */
 	init_fs();
 	
-	/* init UART for MIDI transmission */
+	/* init. UART for MIDI transmission */
 	init_uart();
 	
 	/* send initial MIDI cc values on power on */

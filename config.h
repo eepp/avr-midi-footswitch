@@ -11,7 +11,7 @@
 #define NB_FS			4
 
 /* footswitches data direction registers */
-static volatile uint8_t* g_fs_ddrs[] = {
+static const volatile uint8_t* g_fs_ddrs[] = {
 	&DDRC,
 	&DDRC,
 	&DDRC,
@@ -19,7 +19,7 @@ static volatile uint8_t* g_fs_ddrs[] = {
 };
 
 /* footswitches pins */
-static volatile uint8_t* g_fs_pins[] = {
+static const volatile uint8_t* g_fs_pins[] = {
 	&PINC,
 	&PINC,
 	&PINC,
@@ -27,7 +27,7 @@ static volatile uint8_t* g_fs_pins[] = {
 };
 
 /* footswitches pins masks */
-static uint8_t g_fs_masks[] = {
+static const uint8_t g_fs_masks[] = {
 	_BV(PC0),
 	_BV(PC1),
 	_BV(PC2),
@@ -35,7 +35,7 @@ static uint8_t g_fs_masks[] = {
 };
 
 /* MIDI cc numbers for each footswitch */
-static uint8_t g_midi_cc[] = {
+static const uint8_t g_midi_cc[] = {
 	102,
 	103,
 	104,
@@ -45,9 +45,9 @@ static uint8_t g_midi_cc[] = {
 /* sync push button */
 #define SYNC_BTN_PRESENT /* comment this to disable */
 #ifdef SYNC_BTN_PRESENT
-static volatile uint8_t* g_sync_ddr = &DDRC;
-static volatile uint8_t* g_sync_pin = &PINC;
-static volatile uint8_t g_sync_mask = _BV(PC4);
+static const volatile uint8_t* g_sync_ddr = &DDRC;
+static const volatile uint8_t* g_sync_pin = &PINC;
+static const uint8_t g_sync_mask = _BV(PC4);
 #endif /* SYNC_BTN_PRESENT */
 
 #endif /* _CONFIG_H */
