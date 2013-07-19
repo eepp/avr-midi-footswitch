@@ -98,7 +98,7 @@ static void send_cc(uint8_t index, uint8_t on) {
 	uart_send(g_midi_cc[index]);
 	
 	/* 0 (off) or 127 (on) */
-	uart_send(on ? 127 : 0);
+	uart_send(on ? FS_ON_VAL : FS_OFF_VAL);
 }
 
 static void send_all_cc(void) {
