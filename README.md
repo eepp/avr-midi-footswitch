@@ -72,3 +72,15 @@ using
 Power on the circuit, plug the MIDI out cable to your MIDI input
 (sound card, cheap USB MIDI cable, etc.) and enjoy in your favorite
 compatible software.
+
+todo
+----
+
+An interesting feature found on some MIDI footswitch modules is one or
+more inputs for expression pedals. An expression pedal is just a (usually 10 kΩ)
+potentiometer plugged in using a stereo ¼'' jack. On the circuit, you
+can see pin PC5 that's free on purpose: the associated ADC5 channel can
+be used to read such an analog value and send it as a MIDI cc value (0..127).
+
+Other ADC channels could be used by relocating some footswitches inputs
+to e.g. port D.
