@@ -2,7 +2,8 @@ avr-midi-footswitch
 ===================
 
 This is **avr-midi-footswitch**, a MIDI output footswitch module
-controller using an Atmel AVR MCU (Arduino MCUs).
+controller using an Atmel AVR MCU (Arduino MCUs). The firmware weights
+only 621 bytes!
 
 A MIDI footswitch module is a module with switches you can press
 with your foot. Each time you press a switch, a MIDI cc (control
@@ -15,7 +16,8 @@ button which can be used to resend the current MIDI cc values of
 all footswitches.
 
 The MIDI channel and cc numbers are all configurable at compile
-time. The cc values are always 0 (min) for *off* and 127 (max) for *on*.
+time. You can also set the bypass cc value (0 or 127) depending
+on your target software.
 
 ![Circuit diagram](https://raw.github.com/eepp/avr-midi-footswitch/master/circuit/avr-midi-footswitch.png)
 
@@ -42,10 +44,8 @@ In `config.h`:
 
  * configure the desired MIDI channel for cc messages (`MIDI_CHAN`)
  * configure the desired number of footswitches (`NB_FS`)
- * put each footswitch DDR in the `g_fs_ddrs` array
- * put each footswitch pin in the `g_fs_pins` array
- * put each footswitch pin bit mask in the `g_fs_masks` array
- * put each footswitch MIDI cc value in the `g_midi_cc` array
+ * configure the desired cc value when bypassing (`BYPASS_SENDS_ZERO`)
+ * fill the static `g_fs` array with each footswitch configuration
  * if you're going to include a sync button:
   * `#define SYNC_BTN_PRESENT` 
   * sync button DDR goes into `g_sync_ddr`

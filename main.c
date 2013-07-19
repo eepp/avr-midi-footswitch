@@ -26,9 +26,6 @@
 /* UBRR value depending on MIDI baud rate and MCU freq. */
 #define UBRR_VAL		((F_CPU / (16 * 31250UL)) - 1)
 
-/* last footswitches values (must initialize) */
-static uint8_t g_fs_last[NB_FS];
-
 #ifdef SYNC_BTN_PRESENT
 /* last sync button state (0 means released) */
 static uint8_t g_sync_last = 0;
@@ -38,7 +35,7 @@ static uint8_t g_sync_last = 0;
 static const uint8_t g_midi_status_byte = 0xb0 | MIDI_CHAN;
 
 static inline uint8_t read_fs(uint8_t index) {
-	return *(g_fs_pins[index]) & g_fs_masks[index];
+	return *(g_fs[index].pin) & g_fs[index].mask;
 }
 
 #ifdef SYNC_BTN_PRESENT
@@ -61,9 +58,9 @@ static void init_io(void) {
 	/* set Tx as output */
 	DDRD |= _BV(PD1);
 	
-	/* set footswitch pins as inputs */
+	/* set footswitches pins as inputs */
 	for (x = 0; x < NB_FS; ++x) {
-		*(g_fs_ddrs[x]) &= ~(g_fs_masks[x]);
+		*(g_fs[x].ddr) &= ~(g_fs[x].mask);
 	}
 	
 #ifdef SYNC_BTN_PRESENT
@@ -77,7 +74,7 @@ static void init_fs(void) {
 	
 	/* read current footswitches */
 	for (x = 0; x < NB_FS; ++x) {
-		g_fs_last[x] = read_fs(x);
+		g_fs[x].last = read_fs(x);
 	}
 }
 
@@ -95,17 +92,17 @@ static void send_cc(uint8_t index, uint8_t on) {
 	uart_send(g_midi_status_byte);
 	
 	/* MIDI cc */
-	uart_send(g_midi_cc[index]);
+	uart_send(g_fs[index].cc);
 	
 	/* 0 (off) or 127 (on) */
-	uart_send(on ? FS_ON_VAL : FS_OFF_VAL);
+	uart_send(on ? FS_ON_CC_VAL : FS_OFF_CC_VAL);
 }
 
 static void send_all_cc(void) {
 	uint8_t x;
 	
 	for (x = 0; x < NB_FS; ++x) {
-		send_cc(x, g_fs_last[x]);
+		send_cc(x, g_fs[x].last);
 	}
 }
 
@@ -129,13 +126,13 @@ static void footswitch(void) {
 	
 	for (;;) {
 		for (x = 0; x < NB_FS; ++x) {
-			if (read_fs(x) != g_fs_last[x]) {
+			if (read_fs(x) != g_fs[x].last) {
 				/* debounce */
 				_delay_ms(SW_DEB_TIME);
 				s = read_fs(x);
-				if (s != g_fs_last[x]) {
+				if (s != g_fs[x].last) {
 					/* footswitch is toggled */
-					g_fs_last[x] = s;
+					g_fs[x].last = s;
 					send_cc(x, s);
 				}
 			}

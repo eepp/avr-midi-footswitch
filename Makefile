@@ -20,7 +20,7 @@ TARGET_MAP = $(TARGET).map
 
 # configuration
 HEXFORMAT = ihex
-OPTLEVEL = 2
+OPTLEVEL = s
 
 # tools
 CC = avr-gcc
