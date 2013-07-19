@@ -9,7 +9,9 @@ A MIDI footswitch module is a module with switches you can press
 with your foot. Each time you press a switch, a MIDI cc (control
 change) message is sent to the MIDI output. It's mostly used by
 musicians, especially guitarists and bass players, with software
-effects and stomp boxes like Guitarix, AmpliTube and Guitar Rig.
+effects and stomp boxes like [Guitarix](http://guitarix.sourceforge.net/),
+[AmpliTube](http://www.ikmultimedia.com/products/amplitube/) and
+[Guitar Rig](http://www.native-instruments.com/en/products/komplete/guitar/guitar-rig-5-pro/).
 
 This MIDI footswitch module also features a MIDI cc synchronization
 button which can be used to resend the current MIDI cc values of
@@ -53,7 +55,8 @@ In `config.h`:
   * sync button pin bit mask goes into `g_sync_mask`
 
 In `main.c`: you might need to change a few register/bit names in the
-source to match your specific AVR MCU. Look at the `init_uart`,
+source to match your specific AVR MCU if you're not using an ATmega328P
+compatible chip. Look at the `init_uart`,
 `init_io`, `wait_uart_tx_ready` and `uart_send` functions.
 
 compiling
