@@ -17,8 +17,8 @@ all footswitches.
 The MIDI channel and cc numbers are all configurable at compile
 time. The cc values are always 0 (min) for *off* and 127 (max) for *on*.
 
-The OSHW circuit diagram will be published in a few days with some
-photos of my personal implementation (hand soldered on a strip board).
+![Circuit diagram](https://raw.github.com/eepp/avr-midi-footswitch/master/circuit/avr-midi-footswitch.png)
+
 A MIDI footswitch doesn't need lots of components: the MCU, a few
 capacitors (for decoupling and to support the crystal oscillator),
 a crystal oscillator (I used 8 MHz), pull-down resistors (10 kΩ)
