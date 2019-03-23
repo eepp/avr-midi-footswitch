@@ -1,89 +1,69 @@
-avr-midi-footswitch
+AVR MIDI footswitch
 ===================
+This is _AVR MIDI footswitch_, a configurable MIDI output footswitch
+module which uses an AVR MCU (Arduino MCUs). The firmware weights only
+about 700 bytes (ATmega88PA, four switches)!
 
-This is **avr-midi-footswitch**, a MIDI output footswitch module
-controller using an Atmel AVR MCU (Arduino MCUs). The firmware weights
-only 621 bytes!
+A MIDI footswitch module is a module with switches you can press with
+your foot. Each time you press a switch, the module sends a MIDI CC
+(control change) to the MIDI output. It's mostly used by musicians,
+especially guitarists and bass players, with software effects and stomp
+boxes like Guitarix, AmpliTube, and Guitar Rig.
 
-A MIDI footswitch module is a module with switches you can press
-with your foot. Each time you press a switch, a MIDI cc (control
-change) message is sent to the MIDI output. It's mostly used by
-musicians, especially guitarists and bass players, with software
-effects and stomp boxes like [Guitarix](http://guitarix.sourceforge.net/),
-[AmpliTube](http://www.ikmultimedia.com/products/amplitube/) and
-[Guitar Rig](http://www.native-instruments.com/en/products/komplete/guitar/guitar-rig-5-pro/).
+The MIDI footswitch module is fully configurable (see `config.h` and
+`config.c`):
 
-This MIDI footswitch module also features a MIDI cc synchronization
-button which can be used to resend the current MIDI cc values of
-all footswitches.
+* Switch debounce time
+* Number of footswitches
+* UART configuration to adapt to your MCU
+* Optional LED animation at power-up
+* Per footswitch:
+  * Whether the switch is a momentary or an on-off switch
+  * Switch's data direction register, pin register, and pin position to
+    use
+  * MIDI channel, CC number, and CC values for on/off states to send
+  * Whether this footswitch has an associated LED or not
+  * LED's data direction register, port register, and pin position to
+    use
 
-The MIDI channel and cc numbers are all configurable at compile
-time. You can also set the bypass cc value (0 or 127) depending
-on your target software.
+Circuit example:
 
 ![Circuit diagram](https://raw.github.com/eepp/avr-midi-footswitch/master/circuit/avr-midi-footswitch.png)
 
-A MIDI footswitch doesn't need lots of components: the MCU, a few
-capacitors (for decoupling and to support the crystal oscillator),
-a crystal oscillator (I used 8 MHz), pull-down resistors (10 kΩ)
-and the actual footswitches. The MIDI output also needs a 220 Ω
-resistor.
+A MIDI footswitch module doesn't need a lot of components: the MCU, a
+few capacitors (for decoupling and to support the crystal oscillator), a
+crystal oscillator (I used 8 MHz), pull-down resistors (10 kΩ) and the
+actual switches. The MIDI output also needs a 220 Ω resistor and a
+socket. If you want LEDs to indicate each footswitch's current state,
+you also need a few more resistors to limit the current.
 
-configuration
--------------
-
-Before compiling the firmware, you need to configure a few things.
-
-In the `Makefile`:
-
- * modify the `F_CPU` variable to match your MCU frequency (don't forget the `UL` suffix)
- * modify the `MCU` variable to match your exact AVR MCU model
-
-You may also modify the `PROGFLAGS` if you intend to program your
-chip with something else than USBasp (but why would you do this?).
-
-In `config.h`:
-
- * configure the desired MIDI channel for cc messages (`MIDI_CHAN`)
- * configure the desired number of footswitches (`NB_FS`)
- * configure the desired cc value when bypassing (`BYPASS_SENDS_ZERO`)
- * fill the static `g_fs` array with each footswitch configuration
- * if you're going to include a sync button:
-  * `#define SYNC_BTN_PRESENT` 
-  * sync button DDR goes into `g_sync_ddr`
-  * sync button pin goes into `g_sync_pin`
-  * sync button pin bit mask goes into `g_sync_mask`
-
-In `main.c`: you might need to change a few register/bit names in the
-source to match your specific AVR MCU if you're not using an ATmega328P
-compatible chip. Look at the `init_uart`,
-`init_io`, `wait_uart_tx_ready` and `uart_send` functions.
-
-compiling
+Configure
 ---------
+Before you compile the firmware, you need to configure a few things:
 
-    $ make
-    
-programming
------------
+In `Makefile`:
 
-    # make program
+* Set the `F_CPU` variable to match your MCU's frequency (don't forget the `UL` suffix).
+* Modify the `MCU` variable to match your exact AVR MCU model.
 
-using
------
+You can also modify the `PROGFLAGS` if you intend to program your chip
+with something else than USBasp (but why would you do this?).
 
-Power on the circuit, plug the MIDI out cable to your MIDI input
-(sound card, cheap USB MIDI cable, etc.) and enjoy in your favorite
-compatible software.
+Edit `config.h` and `config.c` to configure the firmware. The `g_cfg`
+array's size in `config.c` must match the value of `CFG_NB_FS`.
 
-todo
-----
+Compile
+-------
 
-An interesting feature found on some MIDI footswitch modules is one or
-more inputs for expression pedals. An expression pedal is just a (usually 10 kΩ)
-potentiometer plugged in using a stereo ¼'' jack. On the circuit, you
-can see pin PC5 that's free on purpose: the associated ADC5 channel can
-be used to read such an analog value and send it as a MIDI cc value (0..127).
+    make
 
-Other ADC channels could be used by relocating some footswitches inputs
-to e.g. port D.
+Program
+-------
+
+    make program
+
+Use
+---
+Plug the MIDI cable to your MIDI input (sound card, cheap USB MIDI
+cable, etc.), power on the module, and enjoy the device with your
+favorite compatible software.

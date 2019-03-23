@@ -5,11 +5,11 @@
 # author:	Philippe Proulx <eepp.ca>
 
 # sources
-C_SRC = main.c
+C_SRC = main.c config.c
 H_SRC = config.h
 
 # target MCU
-MCU = atmega328p
+MCU = atmega88p
 F_CPU = 8000000UL
 
 # targets
@@ -49,7 +49,7 @@ LDFLAGS = -Wl,-Map,$(TARGET_MAP) -mmcu=$(MCU)
 all: $(TARGET_OUT)
 
 # make output
-$(TARGET_OUT): $(O_FILES) $(H_SRC)
+$(TARGET_OUT): $(O_FILES)
 	$(CC) $(LDFLAGS) -o $@ $(O_FILES) && \
 	$(SIZE) $(TARGET_OUT)
 
@@ -60,9 +60,9 @@ $(TARGET_HEX): $(TARGET_OUT)
 # program target
 program: $(TARGET_HEX)
 	$(PROG) $(PROGFLAGS) -U flash:w:$(TARGET_HEX)
-	
+
 # objects from C files
-%.o : %.c
+%.o : %.c $(H_SRC)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 # clean target
